@@ -11,12 +11,15 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 
 //Default dot settings 
  var size = 10;
- var color = 'red'; //Can also use hex for colors
- var fillColor = 'red';
+ var color = 'blue'; //Can also use hex for colors
+ var fillColor = 'blue';
  var fillOpacity = 0.5;
 
 //Variables for layer management of data
 var singleFamilyArr = [];
+var multiFamilyArr = [];
+var nonResidentialArr = [];
+var vacantResidentialArr = [];
 
 //Add every entry in the data to the map
 data.data.forEach(function(entry) {
@@ -26,22 +29,44 @@ data.data.forEach(function(entry) {
       color: color,
       fillColor: fillColor,
       fillOpacity: fillOpacity
-    }).addTo(map).bindPopup("I am a circle.");
+    }).addTo(map).bindPopup(JSON.parse(entry[11][0]).address + ",\n" +JSON.parse(entry[11][0]).city);
 
     if(entry[10] == "Single Family") {
       singleFamilyArr.push(dot);
-      dot.setStyle({color:'blue', fillColor: 'blue'});
+      dot.setStyle({color:'red', fillColor: 'red'});
+    }
+
+    if(entry[10] == "Multi-Family") {
+      multiFamilyArr.push(dot);
+      dot.setStyle({color:'orange', fillColor: 'orange'});
+    }
+
+    if(entry[10] == "Non-Residential") {
+      nonResidentialArr.push(dot);
+      dot.setStyle({color:'purple', fillColor: 'purple'});
+    }
+
+     if(entry[10] == "Vacant Residential") {
+      vacantResidentialArr.push(dot);
+      dot.setStyle({color:'green', fillColor: 'green'});
     }
   }
 });
 
+//Group the dots by their arrays
 var singleFamily = L.layerGroup(singleFamilyArr);
+var multiFamily = L.layerGroup(multiFamilyArr);
+var nonResidential = L.layerGroup(nonResidentialArr);
+var vacantResidential = L.layerGroup(vacantResidentialArr);
 
 //Add all the layers into base map or overlay map
 var baseMaps = {
 };
 var overlayMaps = {
-    "Single-Family": singleFamily
+    "Single-Family": singleFamily,
+    "Multi-Family": multiFamily,
+    "Non-Residential": nonResidential,
+    "Vacant-Residential": vacantResidential
 };
 
 //Add the layers on the map
@@ -55,3 +80,4 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 //Debug statement to console to see formatting of data
 console.log(data.data[0]);
+console.log(JSON.parse(data.data[0][11][0]).address);
